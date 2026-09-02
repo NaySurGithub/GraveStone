@@ -13,13 +13,13 @@ graves **survive server restarts**.
 - Custom block `gravestone:gravestone` with a dedicated model
   (`geometry.tombstone`) and a 32x32 pixel-art texture.
 - Death drops and XP levels are captured on `PlayerDeathEvent` and stored in
-  the grave's block entity — nothing falls on the ground.
+  the grave's block entity - nothing falls on the ground.
 - Full NBT persistence: graves and their content are reloaded from the chunk
   data after a restart.
 - Two recovery modes: break the grave, or right-click it.
 - Owner-only protection (with a bypass permission for staff).
 - The resource pack is **embedded in the plugin jar** and loaded by the PNX
-  `ResourcePackManager` at boot — no manual copy into `resource_packs/`.
+  `ResourcePackManager` at boot - no manual copy into `resource_packs/`.
 - Respects the `keepInventory` game rule (no grave is created when it is on).
 - Items with Curse of Vanishing vanish, like vanilla.
 - Graves are blast-proof and cannot be moved by pistons.
@@ -48,7 +48,7 @@ graves **survive server restarts**.
 | Command | Permission | Default | Description |
 | --- | --- | --- | --- |
 | `/gravestone reload` | `gravestone.command` | op | Reloads `config.yml`. |
-| — | `gravestone.bypass` | op | Open/break any grave even with `owner-only` enabled. |
+| - | `gravestone.bypass` | op | Open/break any grave even with `owner-only` enabled. |
 
 ## Building
 
@@ -59,7 +59,7 @@ graves **survive server restarts**.
 The jar lands in `build/libs/`. The build compiles against
 `org.powernukkitx:server` from `repo.powernukkitx.org` (version set by
 `pnxVersion` in `gradle.properties`). To build against a local server jar
-instead, drop it into a `libs/` folder at the project root — it then takes
+instead, drop it into a `libs/` folder at the project root - it then takes
 precedence over the remote artifact.
 
 ## Compatibility
