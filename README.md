@@ -4,7 +4,7 @@
 where you fell — with all your items and XP safely inside. Walk back, break
 it, and everything is yours again.
 
-![Gravestone block](.jarbage/icon.png)
+![Gravestone](https://raw.githubusercontent.com/NaySurGithub/GraveStone/main/.jarbage/icon.png "Gravestone")
 
 ## Features
 
