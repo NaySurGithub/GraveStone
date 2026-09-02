@@ -2,21 +2,19 @@ package io.github.naysurgithub.gravestone.blockentity;
 
 import io.github.naysurgithub.gravestone.GraveStonePlugin;
 import io.github.naysurgithub.gravestone.block.BlockGravestone;
-import org.cloudburstmc.protocol.bedrock.data.actor.ActorFlags;
 import org.powernukkitx.Player;
 import org.powernukkitx.blockentity.BlockEntity;
-import org.powernukkitx.entity.Entity;
-import org.powernukkitx.entity.EntityID;
-import org.powernukkitx.entity.item.EntityArmorStand;
 import org.powernukkitx.item.Item;
-import org.powernukkitx.level.Position;
+import org.powernukkitx.level.Level;
 import org.powernukkitx.level.format.IChunk;
 import org.powernukkitx.nbt.tag.CompoundTag;
 import org.powernukkitx.nbt.tag.ListTag;
+import org.powernukkitx.network.primitiveshape.PrimitiveShapes;
 import org.powernukkitx.utils.ItemHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,32 +34,51 @@ public class BlockEntityGravestone extends BlockEntity {
     private static final String TAG_XP_LEVELS = "XpLevels";
     private static final String TAG_DEATH_TIME = "DeathTime";
 
-    private static final Set<Long> HOLOGRAM_ENTITY_IDS = ConcurrentHashMap.newKeySet();
+    private static final Set<BlockEntityGravestone> ACTIVE_GRAVES = ConcurrentHashMap.newKeySet();
 
     private UUID ownerUuid;
     private String ownerName;
     private List<Item> items;
     private int xpLevels;
     private long deathTime;
-    private EntityArmorStand hologram;
+    private final Map<Player, Integer> hologramViewers = new ConcurrentHashMap<>();
 
     public BlockEntityGravestone(IChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
 
-    public static boolean isHologram(Entity entity) {
-        return HOLOGRAM_ENTITY_IDS.contains(entity.getId());
+    /**
+     * Shows the holograms of the given level to the player and hides the
+     * ones from any other level. Call on join and on level change.
+     */
+    public static void syncHolograms(Player player, Level level) {
+        for (BlockEntityGravestone grave : ACTIVE_GRAVES) {
+            if (grave.getLevel() == level) {
+                grave.showHologramTo(player);
+            } else {
+                grave.hideHologramFrom(player);
+            }
+        }
+    }
+
+    /** Drops all hologram tracking for a disconnecting player. */
+    public static void forgetPlayer(Player player) {
+        for (BlockEntityGravestone grave : ACTIVE_GRAVES) {
+            grave.hologramViewers.remove(player);
+        }
     }
 
     @Override
     protected void initBlockEntity() {
         super.initBlockEntity();
-        spawnHologram();
+        ACTIVE_GRAVES.add(this);
+        showHologramToLevel();
     }
 
     @Override
     public void close() {
-        despawnHologram();
+        ACTIVE_GRAVES.remove(this);
+        hideHologramFromAll();
         super.close();
     }
 
@@ -112,45 +129,55 @@ public class BlockEntityGravestone extends BlockEntity {
         this.deathTime = deathTime;
         saveNBT();
         setDirty();
-        despawnHologram();
-        spawnHologram();
+        hideHologramFromAll();
+        showHologramToLevel();
     }
 
-    private void spawnHologram() {
+    private String hologramText() {
         GraveStonePlugin plugin = GraveStonePlugin.getInstance();
         if (plugin == null || !plugin.getSettings().hologramEnabled()) {
-            return;
+            return "";
         }
         if (ownerName == null || ownerName.isEmpty()) {
+            return "";
+        }
+        return plugin.getSettings().hologramText().replace("{player}", ownerName);
+    }
+
+    private void showHologramToLevel() {
+        Level level = this.getLevel();
+        if (level == null) {
             return;
         }
-        String text = plugin.getSettings().hologramText().replace("{player}", ownerName);
+        for (Player player : level.getPlayers().values()) {
+            showHologramTo(player);
+        }
+    }
+
+    private void showHologramTo(Player player) {
+        if (hologramViewers.containsKey(player)) {
+            return;
+        }
+        String text = hologramText();
         if (text.isEmpty()) {
             return;
         }
-
-        Position pos = Position.fromObject(this.add(0.5, 1.1, 0.5), this.getLevel());
-        if (!(Entity.createEntity(EntityID.ARMOR_STAND, pos) instanceof EntityArmorStand stand)) {
-            return;
-        }
-        stand.setCanBeSavedWithChunk(false);
-        stand.setDataFlag(ActorFlags.INVISIBLE, true);
-        stand.setImmobile(true);
-        stand.setScale(0.0001f);
-        stand.setNameTag(text);
-        stand.setNameTagVisible(true);
-        stand.setNameTagAlwaysVisible(true);
-        stand.spawnToAll();
-
-        HOLOGRAM_ENTITY_IDS.add(stand.getId());
-        this.hologram = stand;
+        int networkId = PrimitiveShapes.text(this.add(0.5, 1.3, 0.5), text)
+                .maxRenderDistance(48f)
+                .showTo(player);
+        hologramViewers.put(player, networkId);
     }
 
-    private void despawnHologram() {
-        if (hologram != null) {
-            HOLOGRAM_ENTITY_IDS.remove(hologram.getId());
-            hologram.close();
-            hologram = null;
+    private void hideHologramFrom(Player player) {
+        Integer networkId = hologramViewers.remove(player);
+        if (networkId != null && player.isOnline()) {
+            PrimitiveShapes.remove(player, networkId);
+        }
+    }
+
+    private void hideHologramFromAll() {
+        for (Player player : new ArrayList<>(hologramViewers.keySet())) {
+            hideHologramFrom(player);
         }
     }
 

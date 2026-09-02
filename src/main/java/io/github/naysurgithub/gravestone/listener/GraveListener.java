@@ -9,9 +9,10 @@ import org.powernukkitx.event.EventHandler;
 import org.powernukkitx.event.EventPriority;
 import org.powernukkitx.event.Listener;
 import org.powernukkitx.event.block.BlockBreakEvent;
-import org.powernukkitx.event.entity.EntityDamageEvent;
-import org.powernukkitx.event.player.PlayerInteractEntityEvent;
+import org.powernukkitx.event.entity.EntityLevelChangeEvent;
 import org.powernukkitx.event.player.PlayerInteractEvent;
+import org.powernukkitx.event.player.PlayerJoinEvent;
+import org.powernukkitx.event.player.PlayerQuitEvent;
 
 public final class GraveListener implements Listener {
 
@@ -73,18 +74,22 @@ public final class GraveListener implements Listener {
         plugin.getGraveManager().recover(player, grave);
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onHologramDamage(EntityDamageEvent event) {
-        if (BlockEntityGravestone.isHologram(event.getEntity())) {
-            event.setCancelled(true);
-        }
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        BlockEntityGravestone.syncHolograms(player, player.getLevel());
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onHologramInteract(PlayerInteractEntityEvent event) {
-        if (BlockEntityGravestone.isHologram(event.getEntity())) {
-            event.setCancelled(true);
+    public void onLevelChange(EntityLevelChangeEvent event) {
+        if (event.getEntity() instanceof Player player) {
+            BlockEntityGravestone.syncHolograms(player, event.getTarget());
         }
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        BlockEntityGravestone.forgetPlayer(event.getPlayer());
     }
 
     private boolean mayLoot(Player player, BlockEntityGravestone grave) {
