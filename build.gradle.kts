@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    // Drop a local PowerNukkitX jar into libs/ to build against it instead of the remote artifact.
+    compileOnly("org.jetbrains:annotations:26.1.0")
     val localPnx = file("libs")
         .listFiles { f -> f.extension == "jar" }
         ?.sortedBy { it.name }
