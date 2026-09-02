@@ -2,6 +2,7 @@
 /*
 
 !/.gitignore
+!/.github/
 !/README.md
 !/LICENSE
 !/build.gradle.kts

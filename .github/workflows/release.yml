@@ -1,0 +1,62 @@
+name: 🪦 Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: 🚀 Build & Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔎 Read plugin version
+        id: version
+        run: echo "version=$(grep '^version=' gradle.properties | cut -d= -f2 | tr -d ' \r')" >> "$GITHUB_OUTPUT"
+
+      - name: 🕵️ Check if release already exists
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "v${{ steps.version.outputs.version }}" --repo "${{ github.repository }}" > /dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Release v${{ steps.version.outputs.version }} already exists, nothing to do."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "Release v${{ steps.version.outputs.version }} does not exist yet, building it."
+          fi
+
+      - name: ☕ Set up Java 21
+        if: steps.check.outputs.exists == 'false'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: 🐘 Set up Gradle
+        if: steps.check.outputs.exists == 'false'
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: 🔨 Build jar
+        if: steps.check.outputs.exists == 'false'
+        run: |
+          chmod +x gradlew
+          ./gradlew build --no-daemon
+
+      - name: 🎉 Create release
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${{ steps.version.outputs.version }}" \
+            "build/libs/GraveStone-${{ steps.version.outputs.version }}.jar" \
+            --repo "${{ github.repository }}" \
+            --title "GraveStone v${{ steps.version.outputs.version }}" \
+            --generate-notes
