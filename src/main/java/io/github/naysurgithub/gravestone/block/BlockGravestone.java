@@ -49,7 +49,9 @@ public class BlockGravestone extends BlockTransparent implements CustomBlock, Bl
                     .texture("gravestone")
                     .destructibleByMining(clientBreakSeconds)
                     .destructibleByExplosion(false)
-                    .collisionBox(new Vector3f(-8, 0, -8), new Vector3f(16, 15, 16))
+                    .collisionBox(new Vector3f(-8, 0, -8), new Vector3f(16, 2, 16))
+                    .collisionBox(new Vector3f(-6, 2, -4), new Vector3f(12, 2, 10))
+                    .collisionBox(new Vector3f(-5, 2, -7), new Vector3f(10, 13, 3))
                     .selectionBox(new Vector3f(-8, 0, -8), new Vector3f(16, 15, 16))
                     .isHiddenInCommands(true)
                     .build();

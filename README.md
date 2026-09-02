@@ -71,8 +71,8 @@ precedence over the remote artifact.
 
 - The block is registered through `BlockRegistry#registerCustomBlock`, with a
   `CustomBlockDefinition` that points at `geometry.tombstone` and the
-  `gravestone` terrain texture; the collision/selection box matches the model
-  (16x15x16).
+  `gravestone` terrain texture; the collision shape is made of three boxes
+  matching the actual model (dirt mound base, mound bump, stone slab).
 - The block entity is registered in `BlockEntityRegistry` under the save id
   `GraveStone` during `onLoad`, before any world chunk is read, so stored
   graves deserialize correctly at startup.
