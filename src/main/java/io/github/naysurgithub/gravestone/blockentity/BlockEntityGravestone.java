@@ -29,8 +29,8 @@ public class BlockEntityGravestone extends BlockEntity {
     private static final String TAG_DEATH_TIME = "DeathTime";
 
     private UUID ownerUuid;
-    private String ownerName = "";
-    private final List<Item> items = new ArrayList<>();
+    private String ownerName;
+    private List<Item> items;
     private int xpLevels;
     private long deathTime;
 
@@ -45,7 +45,7 @@ public class BlockEntityGravestone extends BlockEntity {
         this.ownerName = nbt.getString(TAG_OWNER_NAME);
         this.xpLevels = nbt.getInt(TAG_XP_LEVELS);
         this.deathTime = nbt.getLong(TAG_DEATH_TIME);
-        this.items.clear();
+        this.items = new ArrayList<>();
         if (nbt.containsList(TAG_ITEMS)) {
             for (CompoundTag tag : nbt.getList(TAG_ITEMS, CompoundTag.class).getAll()) {
                 Item item = ItemHelper.read(tag);
