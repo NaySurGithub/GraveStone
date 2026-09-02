@@ -2,28 +2,25 @@ plugins {
     java
 }
 
-group = providers.gradleProperty("group").get()
+group = "io.github.naysurgithub"
 version = providers.gradleProperty("version").get()
 
 repositories {
     mavenCentral()
-    maven("https://repo.powernukkitx.org/releases")
-    maven("https://repo.powernukkitx.org/snapshots")
+    maven {
+        name = "powerNukkitXReleases"
+        url = uri("https://repo.powernukkitx.org/releases")
+    }
     maven("https://repo.opencollab.dev/maven-releases/")
-    maven("https://repo.opencollab.dev/maven-snapshots/")
+    maven("https://repo.opencollab.dev/maven-snapshots/") {
+        mavenContent {
+            snapshotsOnly()
+        }
+    }
 }
 
 dependencies {
-    compileOnly("org.jetbrains:annotations:26.1.0")
-    val localPnx = file("libs")
-        .listFiles { f -> f.extension == "jar" }
-        ?.sortedBy { it.name }
-        ?.firstOrNull()
-    if (localPnx != null) {
-        compileOnly(files(localPnx))
-    } else {
-        compileOnly("org.powernukkitx:server:${providers.gradleProperty("pnxVersion").get()}")
-    }
+    compileOnly("org.powernukkitx:server:${providers.gradleProperty("pnxVersion").get()}")
 }
 
 java {
@@ -32,7 +29,12 @@ java {
     }
 }
 
+tasks.withType<JavaCompile>().configureEach {
+    options.encoding = "UTF-8"
+}
+
 tasks.processResources {
+    filteringCharset = "UTF-8"
     filesMatching("plugin.yml") {
         expand("version" to project.version)
     }
