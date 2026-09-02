@@ -41,7 +41,7 @@ public class BlockEntityGravestone extends BlockEntity {
     private List<Item> items;
     private int xpLevels;
     private long deathTime;
-    private final Map<Player, Integer> hologramViewers = new ConcurrentHashMap<>();
+    private Map<Player, Integer> hologramViewers;
 
     public BlockEntityGravestone(IChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -81,6 +81,7 @@ public class BlockEntityGravestone extends BlockEntity {
 
     @Override
     protected void initBlockEntity() {
+        this.hologramViewers = new ConcurrentHashMap<>();
         super.initBlockEntity();
         ACTIVE_GRAVES.add(this);
         showHologramToLevel();
