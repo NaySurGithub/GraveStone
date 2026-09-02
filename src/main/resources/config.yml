@@ -36,6 +36,13 @@ owner-only: true
 # false -> everything is dropped at the grave
 direct-to-inventory: true
 
+# Floating hologram above the grave (invisible armor stand).
+# {player} is replaced by the dead player's name.
+# Set text to "" to disable the text while keeping the feature on.
+hologram:
+  enabled: true
+  text: "§7Grave of §f{player}"
+
 # Chat messages. Placeholders: {x} {y} {z} {world} {player}
 # Set a message to "" to disable it.
 messages:

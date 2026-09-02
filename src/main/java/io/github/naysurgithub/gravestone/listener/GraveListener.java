@@ -9,6 +9,8 @@ import org.powernukkitx.event.EventHandler;
 import org.powernukkitx.event.EventPriority;
 import org.powernukkitx.event.Listener;
 import org.powernukkitx.event.block.BlockBreakEvent;
+import org.powernukkitx.event.entity.EntityDamageEvent;
+import org.powernukkitx.event.player.PlayerInteractEntityEvent;
 import org.powernukkitx.event.player.PlayerInteractEvent;
 
 public final class GraveListener implements Listener {
@@ -69,6 +71,20 @@ public final class GraveListener implements Listener {
         // Recovery on break works in both modes so a broken grave can never
         // destroy its content.
         plugin.getGraveManager().recover(player, grave);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onHologramDamage(EntityDamageEvent event) {
+        if (BlockEntityGravestone.isHologram(event.getEntity())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onHologramInteract(PlayerInteractEntityEvent event) {
+        if (BlockEntityGravestone.isHologram(event.getEntity())) {
+            event.setCancelled(true);
+        }
     }
 
     private boolean mayLoot(Player player, BlockEntityGravestone grave) {

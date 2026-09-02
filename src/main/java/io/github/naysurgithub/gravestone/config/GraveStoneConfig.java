@@ -31,6 +31,8 @@ public final class GraveStoneConfig {
     private final boolean saveXpInGrave;
     private final boolean ownerOnly;
     private final boolean directToInventory;
+    private final boolean hologramEnabled;
+    private final String hologramText;
     private final String messageDeath;
     private final String messageRecovered;
     private final String messageNotOwner;
@@ -50,6 +52,8 @@ public final class GraveStoneConfig {
         this.saveXpInGrave = config.getBoolean("save-xp-in-grave", true);
         this.ownerOnly = config.getBoolean("owner-only", true);
         this.directToInventory = config.getBoolean("direct-to-inventory", true);
+        this.hologramEnabled = config.getBoolean("hologram.enabled", true);
+        this.hologramText = config.getString("hologram.text", "§7Grave of §f{player}");
         this.messageDeath = config.getString("messages.death", "");
         this.messageRecovered = config.getString("messages.recovered", "");
         this.messageNotOwner = config.getString("messages.not-owner", "");
@@ -77,6 +81,14 @@ public final class GraveStoneConfig {
 
     public boolean directToInventory() {
         return directToInventory;
+    }
+
+    public boolean hologramEnabled() {
+        return hologramEnabled;
+    }
+
+    public String hologramText() {
+        return hologramText;
     }
 
     public String messageDeath() {

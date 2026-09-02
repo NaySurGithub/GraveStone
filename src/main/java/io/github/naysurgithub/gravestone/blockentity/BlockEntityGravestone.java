@@ -1,9 +1,15 @@
 package io.github.naysurgithub.gravestone.blockentity;
 
+import io.github.naysurgithub.gravestone.GraveStonePlugin;
 import io.github.naysurgithub.gravestone.block.BlockGravestone;
+import org.cloudburstmc.protocol.bedrock.data.actor.ActorFlags;
 import org.powernukkitx.Player;
 import org.powernukkitx.blockentity.BlockEntity;
+import org.powernukkitx.entity.Entity;
+import org.powernukkitx.entity.EntityID;
+import org.powernukkitx.entity.item.EntityArmorStand;
 import org.powernukkitx.item.Item;
+import org.powernukkitx.level.Position;
 import org.powernukkitx.level.format.IChunk;
 import org.powernukkitx.nbt.tag.CompoundTag;
 import org.powernukkitx.nbt.tag.ListTag;
@@ -11,7 +17,9 @@ import org.powernukkitx.utils.ItemHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Holds the content of a grave. Everything is serialized to the chunk NBT
@@ -28,14 +36,33 @@ public class BlockEntityGravestone extends BlockEntity {
     private static final String TAG_XP_LEVELS = "XpLevels";
     private static final String TAG_DEATH_TIME = "DeathTime";
 
+    private static final Set<Long> HOLOGRAM_ENTITY_IDS = ConcurrentHashMap.newKeySet();
+
     private UUID ownerUuid;
     private String ownerName;
     private List<Item> items;
     private int xpLevels;
     private long deathTime;
+    private EntityArmorStand hologram;
 
     public BlockEntityGravestone(IChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+    }
+
+    public static boolean isHologram(Entity entity) {
+        return HOLOGRAM_ENTITY_IDS.contains(entity.getId());
+    }
+
+    @Override
+    protected void initBlockEntity() {
+        super.initBlockEntity();
+        spawnHologram();
+    }
+
+    @Override
+    public void close() {
+        despawnHologram();
+        super.close();
     }
 
     @Override
@@ -85,6 +112,46 @@ public class BlockEntityGravestone extends BlockEntity {
         this.deathTime = deathTime;
         saveNBT();
         setDirty();
+        despawnHologram();
+        spawnHologram();
+    }
+
+    private void spawnHologram() {
+        GraveStonePlugin plugin = GraveStonePlugin.getInstance();
+        if (plugin == null || !plugin.getSettings().hologramEnabled()) {
+            return;
+        }
+        if (ownerName == null || ownerName.isEmpty()) {
+            return;
+        }
+        String text = plugin.getSettings().hologramText().replace("{player}", ownerName);
+        if (text.isEmpty()) {
+            return;
+        }
+
+        Position pos = Position.fromObject(this.add(0.5, 1.1, 0.5), this.getLevel());
+        if (!(Entity.createEntity(EntityID.ARMOR_STAND, pos) instanceof EntityArmorStand stand)) {
+            return;
+        }
+        stand.setCanBeSavedWithChunk(false);
+        stand.setDataFlag(ActorFlags.INVISIBLE, true);
+        stand.setImmobile(true);
+        stand.setScale(0.0001f);
+        stand.setNameTag(text);
+        stand.setNameTagVisible(true);
+        stand.setNameTagAlwaysVisible(true);
+        stand.spawnToAll();
+
+        HOLOGRAM_ENTITY_IDS.add(stand.getId());
+        this.hologram = stand;
+    }
+
+    private void despawnHologram() {
+        if (hologram != null) {
+            HOLOGRAM_ENTITY_IDS.remove(hologram.getId());
+            hologram.close();
+            hologram = null;
+        }
     }
 
     public void clearContents() {

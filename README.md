@@ -41,6 +41,8 @@ graves **survive server restarts**.
 | `save-xp-in-grave` | `true` | `true`: XP levels are stored in the grave and restored on recovery. `false`: XP drops as orbs at the death point, like vanilla. |
 | `owner-only` | `true` | Only the grave's owner may open or break it. Players with `gravestone.bypass` ignore the check. |
 | `direct-to-inventory` | `true` | `true`: recovered items go straight into the player's inventory, leftovers drop at the grave. `false`: everything drops at the grave. |
+| `hologram.enabled` | `true` | Shows a floating "Grave of X" hologram above the grave (invisible armor stand, never saved to disk, immune to damage and interaction). |
+| `hologram.text` | `"§7Grave of §f{player}"` | Hologram text; `{player}` is the dead player's name. |
 | `messages.*` | see file | Chat messages, with `{x}`, `{y}`, `{z}`, `{world}`, `{player}` placeholders. Set a message to `""` to disable it. |
 
 ## Commands & permissions
@@ -58,9 +60,7 @@ graves **survive server restarts**.
 
 The jar lands in `build/libs/`. The build compiles against
 `org.powernukkitx:server` from `repo.powernukkitx.org` (version set by
-`pnxVersion` in `gradle.properties`). To build against a local server jar
-instead, drop it into a `libs/` folder at the project root - it then takes
-precedence over the remote artifact.
+`pnxVersion` in `gradle.properties`).
 
 ## Compatibility
 
