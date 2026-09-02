@@ -1,0 +1,44 @@
+# ------------------------------------------------------------------
+# GraveStone configuration
+# ------------------------------------------------------------------
+
+# Worlds where graves spawn on death.
+# Convention: a list containing "*" (default) OR an empty list means
+# EVERY world. Otherwise, list world folder names explicitly:
+#   enabled-worlds:
+#     - "world"
+#     - "arena"
+enabled-worlds:
+  - "*"
+
+# How players get their belongings back:
+#   "break"    -> break the gravestone block
+#   "interact" -> right-click the gravestone block
+# In "interact" mode, breaking the grave still returns its content so
+# nothing can ever be lost.
+recovery-mode: "break"
+
+# Server-side hardness of the gravestone block (same scale as vanilla
+# block hardness; stone is 1.5). Changing it requires a server restart
+# because the block is registered once at startup.
+gravestone-hardness: 0.5
+
+# true  -> XP levels are stored in the grave and given back on recovery
+# false -> XP drops as orbs at the death point, like vanilla
+save-xp-in-grave: true
+
+# Only the grave owner may open or break their grave.
+# Players with the "gravestone.bypass" permission ignore this check.
+owner-only: true
+
+# true  -> recovered items go straight into the player's inventory and
+#          whatever does not fit is dropped at the grave
+# false -> everything is dropped at the grave
+direct-to-inventory: true
+
+# Chat messages. Placeholders: {x} {y} {z} {world} {player}
+# Set a message to "" to disable it.
+messages:
+  death: "§7Your belongings rest at §f{x}, {y}, {z}§7 in §f{world}§7."
+  recovered: "§aYou recovered your belongings."
+  not-owner: "§cThis grave is not yours."

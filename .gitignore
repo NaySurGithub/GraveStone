@@ -1,0 +1,14 @@
+# Whitelist: ignore everything, then re-include tracked files only.
+/*
+
+!/.gitignore
+!/README.md
+!/LICENSE
+!/build.gradle.kts
+!/settings.gradle.kts
+!/gradle.properties
+!/gradlew
+!/gradlew.bat
+!/gradle/
+!/src/
+!/.jarbage/

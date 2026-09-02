@@ -1,0 +1,19 @@
+name: GraveStone
+main: io.github.naysurgithub.gravestone.GraveStonePlugin
+version: "${version}"
+api: ["3.0.0"]
+author: NaySurGithub
+description: Stores the belongings of dead players inside a custom gravestone block instead of dropping them.
+website: https://github.com/NaySurGithub/GraveStone
+commands:
+  gravestone:
+    description: GraveStone admin command
+    usage: "/gravestone reload"
+    permission: gravestone.command
+permissions:
+  gravestone.command:
+    description: Allows using the /gravestone admin command
+    default: op
+  gravestone.bypass:
+    description: Bypass the owner-only protection on graves
+    default: op
