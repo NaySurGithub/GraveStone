@@ -48,12 +48,6 @@ public final class GraveStonePlugin extends PluginBase {
 
         getServer().getPluginManager().registerEvents(new DeathListener(this), this);
         getServer().getPluginManager().registerEvents(new GraveListener(this), this);
-
-        if (getResource("assets/resource_pack/manifest.json") != null) {
-            getLogger().info("Embedded resource pack found; PNX serves it to clients from the plugin jar.");
-        } else {
-            getLogger().warning("Embedded resource pack is missing; clients will see a fallback block model.");
-        }
     }
 
     @Override
