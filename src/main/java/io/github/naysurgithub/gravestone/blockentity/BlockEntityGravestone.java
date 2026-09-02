@@ -61,6 +61,17 @@ public class BlockEntityGravestone extends BlockEntity {
         }
     }
 
+    /**
+     * Fully re-sends the holograms of the given level to the player. Call
+     * after a respawn, since the client may drop its debug shapes there.
+     */
+    public static void refreshHolograms(Player player, Level level) {
+        for (BlockEntityGravestone grave : ACTIVE_GRAVES) {
+            grave.hideHologramFrom(player);
+        }
+        syncHolograms(player, level);
+    }
+
     /** Drops all hologram tracking for a disconnecting player. */
     public static void forgetPlayer(Player player) {
         for (BlockEntityGravestone grave : ACTIVE_GRAVES) {

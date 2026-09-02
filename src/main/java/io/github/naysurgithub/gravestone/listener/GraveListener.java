@@ -13,6 +13,7 @@ import org.powernukkitx.event.entity.EntityLevelChangeEvent;
 import org.powernukkitx.event.player.PlayerInteractEvent;
 import org.powernukkitx.event.player.PlayerJoinEvent;
 import org.powernukkitx.event.player.PlayerQuitEvent;
+import org.powernukkitx.event.player.PlayerRespawnEvent;
 
 public final class GraveListener implements Listener {
 
@@ -85,6 +86,16 @@ public final class GraveListener implements Listener {
         if (event.getEntity() instanceof Player player) {
             BlockEntityGravestone.syncHolograms(player, event.getTarget());
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onRespawn(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+        var respawn = event.getRespawnPosition();
+        var level = respawn != null && respawn.left() != null && respawn.left().getLevel() != null
+                ? respawn.left().getLevel()
+                : player.getLevel();
+        BlockEntityGravestone.refreshHolograms(player, level);
     }
 
     @EventHandler
